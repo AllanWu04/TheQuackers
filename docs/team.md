@@ -3,14 +3,14 @@ layout: default
 title:  Team
 ---
 
-# {{ page.title }}
+# {{ The Ducky Team }}
 
 
-## USER 1
-***UCI Net ID***: ucinetid1
+## Allan Wu
+***UCI Net ID***: allankw
 
-## USER 2
-***UCI Net ID***: ucinetid2
+## Emmanuel Bivian
+***UCI Net ID***: ebivian
 
-## USER 3
-***UCI Net ID***: ucinetid3
+## Frank Mei
+***UCI Net ID***: weifanm1
