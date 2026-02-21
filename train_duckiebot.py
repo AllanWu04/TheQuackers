@@ -60,6 +60,7 @@ def make_duckiebot_env() -> UELaneFollowingEnv:
         "use_simple_physics": False,
         "randomize_camera_location_for_tilted_robot": True,
         # "world_name": "DuckiebotsHolodeckMapDomainRandomization",
+        "image_obs_only": True,
     })
     return ImageWrapper(env)
 
