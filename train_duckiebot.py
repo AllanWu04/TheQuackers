@@ -10,7 +10,6 @@ from duckiebots_unreal_sim.holodeck_env import UEDuckiebotsHolodeckEnv
 from duckiebots_unreal_sim.holodeck_lane_following_env import UELaneFollowingEnv
 
 
-
 class ImageWrapper(gym.Env):
     def __init__(self, env):
         super().__init__()
@@ -18,9 +17,10 @@ class ImageWrapper(gym.Env):
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(64, 64, 3), dtype=np.uint8)
         self.action_space = gym.spaces.Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float32)
         self.last_obs = None
+
     def seed(self, seed=None):
         return []
-    
+
     def reset(self):
         obs = self.env.reset()
         image = obs['image'].astype(np.uint8)
@@ -40,7 +40,6 @@ class ImageWrapper(gym.Env):
 
     def close(self):
         self.env.close()
-
 
 
 def make_duckiebot_env() -> UELaneFollowingEnv:
@@ -65,11 +64,10 @@ def make_duckiebot_env() -> UELaneFollowingEnv:
     return ImageWrapper(env)
 
 
-
 def main():
-    experiment_name = "DuckieBotPPO"
+    experiment_name = "DuckieBotPPO_n_envs=4_500000_newparams"
     experiment_log_dir = f"duckiebot_logs/{experiment_name}{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-    env = make_vec_env(make_duckiebot_env, n_envs=1);
+    env = make_vec_env(make_duckiebot_env, n_envs=4);
     print(f'The duckiebot action space: {env.action_space}')
     print(f'The duckiebot observation space: {env.observation_space}')
     env = VecTransposeImage(env)
@@ -83,10 +81,15 @@ def main():
     model = PPO(policy="CnnPolicy",
                 env=env,
                 verbose=1,
-                tensorboard_log=experiment_log_dir)
-    model.learn(total_timesteps=100_000)
-    model.save("duckiebot_ppo_test")
+                tensorboard_log=experiment_log_dir,
+                learning_rate=2e-4,
+                n_steps=2048,
+                batch_size=128,
+                n_epochs=10,
+                ent_coef=0.01, )
 
+    model.learn(total_timesteps=500_000)
+    model.save("duckiebot_ppo_test")
 
 
 if __name__ == "__main__":
