@@ -68,14 +68,14 @@ def make_duckiebot_env() -> UELaneFollowingEnv:
 
 
 def main():
-    experiment_name = "DuckieBotPPO_500k_n_envs=4"
+    experiment_name = "DuckieBotPPO_100k_n_envs=1"
     experiment_log_dir = f"duckiebot_logs/{experiment_name}{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-    env = make_vec_env(make_duckiebot_env, n_envs=4)
+    env = make_vec_env(make_duckiebot_env, n_envs=1)
     print(f'The duckiebot action space: {env.action_space}')
     print(f'The duckiebot observation space: {env.observation_space}')
     env = VecTransposeImage(env)
     env = VecFrameStack(env, n_stack=4)
-    video_trigger = lambda step: step % 5000 == 0
+    video_trigger = lambda step: step % 1000 == 0
     env = TensorboardVideoRecorder(env=env,
                                    video_trigger=video_trigger,
                                    video_length=500,
@@ -85,24 +85,41 @@ def main():
                 env=env,
                 verbose=1,
                 tensorboard_log=experiment_log_dir)
-    model.learn(total_timesteps=500_000)
-    model.save("duckiebot_ppo_test_500k_4envs")
+    model.learn(total_timesteps=100_000)
+    model.save("duckiebot_ppo_test_100k_1envs")
 
 def test_model(model_name: str, n_episodes: int):
     env = make_vec_env(make_duckiebot_env, n_envs=1)
     env = VecTransposeImage(env)
     env = VecFrameStack(env, n_stack=4)
+    print("Loaded environment", flush=True)
     model = PPO.load(model_name, env=env)
-    print("Loaded PPO model")
+    print("Loaded PPO model", flush=True)
+    ep_rews = []
+    ep_lens = []
     for ep in range(n_episodes):
         obs = env.reset()
-        while True:
+        ep_rew = 0.0
+        ep_step = 0
+        done = [False]
+        while not done[0] and ep < 200:
             action, _states = model.predict(obs, deterministic=True)
             obs, reward, done, info = env.step(action)
-            env.render()
-            if done:
-                obs = env.reset()
+            ep_rew += reward[0]
+            ep_step += 1
+            print(f'Ep{ep} T{ep_step}: reward={reward[0]:.3f}', flush=True)
+        ep_rews.append(ep_rew)
+        ep_lens.append(ep_step)
+        print(f'Episode {ep + 1}: reward={ep_rew:.2f}, steps={ep_step}', flush=True)
+
+    print(f'\n--- Results over {n_episodes} episodes ---', flush=True)
+    print(f'Mean reward:  {np.mean(ep_rews):.2f}', flush=True)
+    print(f'Std reward:   {np.std(ep_rews):.2f}', flush=True)
+    print(f'Mean steps:   {np.mean(ep_lens):.1f}', flush=True)
+    print(f'Best episode: {np.max(ep_lens):.2f}', flush=True)
+
+    env.close()
 
 if __name__ == "__main__":
-    main()
-    test_model("duckiebot_ppo_test_500k_4envs", 200)
+    #main()
+    test_model("duckiebot_ppo_test_100k_1envs", 10)
