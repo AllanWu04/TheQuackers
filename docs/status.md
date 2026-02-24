@@ -28,7 +28,7 @@ SAC is our off-policy algorithm chosen for its superior sample efficiency and ro
 
 $$J(\pi) = \sum_{t=0}^{T} \mathbb{E}_{(s_t, a_t) \sim \rho_\pi} [r(s_t, a_t) + \alpha \mathcal{H}(\pi(\cdot|s_t))]$$
 
-Where $$\mathcal{H}$$ denotes the entropy and $\alpha$ is the temperature parameter.
+Where $\mathcal{H}$ denotes the entropy and $\alpha$ is the temperature parameter.
 
 #### 1. Observation & Action Space
 * **Observations**: The raw image is resized to $64 \times 64 \times 3$. We utilize `VecTransposeImage` to convert the data to a channel-first format and `VecFrameStack` with `n_stack=4` to allow the agent to perceive temporal information (motion/velocity) from consecutive frames.
