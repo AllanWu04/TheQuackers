@@ -23,6 +23,13 @@ $$L^{CLIP}(\theta) = \hat{\mathbb{E}}_t \left[ \min(r_t(\theta) \hat{A}_t, \text
 
 Where $r_t(\theta)$ is the probability ratio, and $\hat{A}_t$ is the estimated advantage at time $t$.
 
+### Soft Actor-Critic (SAC):
+SAC is our off-policy algorithm chosen for its superior sample efficiency and robustness in continuous action spaces. Unlike PPO, SAC aims to maximize both the expected reward and entropy, which encourages the agent to explore more diverse behaviors and prevents premature convergence to local optima. The objective function for SAC is:
+
+$$J(\pi) = \sum_{t=0}^{T} \mathbb{E}_{(s_t, a_t) \sim \rho_\pi} [r(s_t, a_t) + \alpha \mathcal{H}(\pi(\cdot|s_t))]$$
+
+Where $\mathcal{H}$ denotes the entropy and $\alpha$ is the temperature parameter.
+
 #### 1. Observation & Action Space
 * **Observations**: The raw image is resized to $64 \times 64 \times 3$. We utilize `VecTransposeImage` to convert the data to a channel-first format and `VecFrameStack` with `n_stack=4` to allow the agent to perceive temporal information (motion/velocity) from consecutive frames.
 * **Actions**: A continuous space representing `[linear_velocity, angular_velocity]`, with both values clipped between $[-1.0, 1.0]$.
@@ -35,6 +42,8 @@ We implemented a multi-faceted reward function to encourage both progress and st
 * **Termination**: A large penalty ($-100.0$) and episode termination if the `DuckiebotsLineOverlapSensor` detects a collision with lane boundaries.
 
 #### 3. Hyperparameters (Current Configuration)
+
+##### PPO:
 We selected and tuned the following hyperparameters for PPO to balance training stability with learning speed:
 
 | Hyperparameter | Value |
@@ -46,9 +55,18 @@ We selected and tuned the following hyperparameters for PPO to balance training 
 
 ##### Tuning Process
 Our tuning process focused on the trade-off between exploration and exploitation. We found that a higher entropy coefficient ($ent\_coef$) was necessary because the agent initially struggled to move forward, often getting stuck rotating in circles. By slightly lowering the learning rate, we achieved more consistent convergence across multiple training runs, reducing the likelihood of the "catastrophic forgetting" often seen in RL lane-following tasks.
-### Soft Actor-Critic (SAC):
-an off-policy maximum-entropy algorithm meant for imprived exploration and sample efficieny in continous control tasks
 
+##### SAC:
+We selected and tuned the following hyperparameters for SAC to balance training stability with learning speed:
+
+| Hyperparameter | Value |
+| :--- | :--- |
+| Learning Rate | $2 \times 10^{-4}$ |
+| Batch Size | $128$ |
+| ent_coef | $0.01$ |
+| Total Timesteps | $500,000$ |
+
+##### Tuning Process
 
 
 ## Evalution
