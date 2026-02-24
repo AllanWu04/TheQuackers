@@ -61,13 +61,20 @@ We selected and tuned the following hyperparameters for SAC to balance training 
 
 | Hyperparameter | Value |
 | :--- | :--- |
-| Learning Rate | $2 \times 10^{-4}$ |
-| Batch Size | $128$ |
-| ent_coef | $0.01$ |
+| Learning Starts | $10,000$ |
+| Batch Size | $256$ |
+| Train Freq (step)| $1$ |
+| Gradient Steps (step) | $1$ |
+| Gamma | $0.99$ |
+| Tau | $0.005$ |
 | Total Timesteps | $500,000$ |
 
 ##### Tuning Process
+Our SAC tuning focused more on stability and hardware limitations. The default SAC hyperparameters produced the most consistent learning behavior, achieving the highest mean episode rewards among our runs before running out to memory. Yet increasing the timesteps from 100,000 to 500,000 resulted in out-of-memory errors due to the replay buffer storing high-dimensional image observations.
 
+To address this issue we reduced the replay buffer size to 200,000 and a batch size of 256 to balance sample diversity and memory usage. Though this did allow the runs to complete, we observed increase instability in performance over time, some runs even showing rapid degradation.
+
+Overall, SAC demonstrated sensitivity to the replay buffer size and training duration. Our tuning will continue to emphasize computational feasibility while attempting to preserve stable learning dynamics.
 
 ## Evaluation
 We evaluated our three configurations based on quantitative training logs and qualitative driving performance.
