@@ -89,15 +89,17 @@ The training progress revealed distinct learning behaviors across the three conf
 | **Recovery Status** | Partial / Plateau | **Significant Breakthrough** | Early Stabilization |
 
 #### Baseline PPO Performance:
-![Baseline PPO Reward Curve](imgs/PPO_baseline.png)
+<img src="imgs/PPO_baseline.png" alt="PPO Rew Curve" width="800" height="500">
+
 The **Baseline PPO** showed an early struggle, with the reward dropping nearly to $-750$ within 20k steps. While it recovered to around $-180$ mid-training, it eventually decayed and plateaued at **-434.38**, indicating it failed to find a long-term stable policy for the environment.
 
 #### Tuned PPO Performance:
-![Tuned PPO Reward Curve](imgs/PPO_tuned.png)
+<img src="imgs/PPO_tuned.png" alt="PPO Tuned Rew Curve" width="800" height="500">  
+
 Our **Tuned PPO** demonstrated a superior recovery capability. After an extensive exploration phase that dipped to $-700$, the agent achieved a major breakthrough around **260k steps**. It stabilized at a significantly higher smoothed reward of **-274.10**, proving that our hyperparameter adjustments directly improved the agent's ability to learn from road boundary penalties.
 
 #### SAC Performance:
-![SAC Reward Curve](imgs/SAC_plot.png)
+<img src="imgs/SAC_plot.png" alt="SAC Rew Curve" width="800" height="500">
 
 The **SAC** agent initially struggled with higher entropy exploration, with rewards dropping to nearly $-1000$ around 60k steps. However, it showed a clear upward trend in the final 30k steps, reaching **-866.27**. While the reward is lower than PPO at this stage, the trajectory suggests potential for continued improvement with more training steps.
 
@@ -132,3 +134,7 @@ Run the agent on a physcial DuckieBot and compare the results with the training 
 - PPO Documentation: https://stable-baselines3.readthedocs.io/en/master/modules/ppo.html
 - duckiebotssim : https://gitlab.jblanier.net/sim2real/duckiebotssim/-/tree/master
 - AI Tools: We utilized Generative AI tools (Gemini/ChatGPT) to assist in debugging the `duckiebotssim` environment wrappers and to troubleshoot errors within our reinforcement learning training scripts.
+
+
+## Progress Video
+<iframe width="560" height="315" src="https://www.youtube.com/embed/-cZzBRPxu5M?si=gbzZBSAsnnrsB-rR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
