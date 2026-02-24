@@ -13,4 +13,4 @@ title:  Team
 ***UCI Net ID***: ebivian | [LinkedIn](www.linkedin.com/in/emmanuelbivian)
 
 ## Frank Mei
-***UCI Net ID***: weifanm1
+***UCI Net ID***: weifanm1 | [LinkedIn](www.linkedin.com/in/wei-fan-mei-6146592a5)
