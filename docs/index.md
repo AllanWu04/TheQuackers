@@ -32,7 +32,7 @@ Visual of Duckiebot undergoing training with SAC.
 - [Stable-Baseline3 Documentation](https://stable-baselines3.readthedocs.io/en/master/)
 
 # Source code:
-https://github.com/AllanWu04/TheQuackers
+- [Link to our repository](https://github.com/AllanWu04/TheQuackers)
 
 # Reports:
 
