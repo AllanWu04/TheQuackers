@@ -6,11 +6,11 @@ title: Status
 # Current Progress
 
 ## Project Summary
-Our project aimes to develop an autonomous navigation system for a Duckiebot withtin the simulated Duckietown environment.
+Our project aims to develop an autonomous navigation system for a Duckiebot withtin the simulated Duckietown environment.
 We strive to create a system with a strong emphasis on safety and adaptability.
 With the current environment we are aiming for the agent to reliably preform lane following, staying reasonbly centered throughout the entire route, from start to finish.
 A 160x120 RGB visual feed is the primary input for the Duckiebot and provides the agent with critical contect regarding lane positioning.
-Based on the camera feed the system produces a continous output in the form of linear and angular velocity commands to control the Duckiebot's movement, allowing it to navigate the field safely and responsivley.
+Based on the camera feed the system produces a continuous output in the form of linear and angular velocity commands to control the Duckiebot's movement, allowing it to navigate the field safely and responsivley.
 Aiming to transfer the traning agent to the physical Duckiebot we are comparing different RL algorithms to compare and discorve which will give us the best result. 
 
 ## Approach
@@ -69,7 +69,49 @@ We selected and tuned the following hyperparameters for SAC to balance training 
 ##### Tuning Process
 
 
-## Evalution
+## Evaluation
+We evaluated our three configurations based on quantitative training logs and qualitative driving performance.
+
+### 1. Quantitative Results
+The training progress revealed distinct learning behaviors across the three configurations:
+
+| Metric | Baseline PPO | Tuned PPO | SAC |
+| :--- | :--- | :--- | :--- |
+| **Final Smoothed Reward** | -434.38 | **-274.10** | -866.27 |
+| **Training Steps** | 100,352 | 352,256 | 98,758 |
+| **Recovery Status** | Partial / Plateau | **Significant Breakthrough** | Early Stabilization |
+
+#### Baseline PPO Performance:
+![Baseline PPO Reward Curve](docs/images/PPO_baseline.png)
+The **Baseline PPO** showed an early struggle, with the reward dropping nearly to $-750$ within 20k steps. While it recovered to around $-180$ mid-training, it eventually decayed and plateaued at **-434.38**, indicating it failed to find a long-term stable policy for the environment.
+
+#### Tuned PPO Performance:
+![Tuned PPO Reward Curve](docs/images/PPO_tuned.png)
+Our **Tuned PPO** demonstrated a superior recovery capability. After an extensive exploration phase that dipped to $-700$, the agent achieved a major breakthrough around **260k steps**. It stabilized at a significantly higher smoothed reward of **-274.10**, proving that our hyperparameter adjustments directly improved the agent's ability to learn from road boundary penalties.
+
+#### SAC Performance:
+![SAC Plot](docs/images/SAC_plot.png)
+
+The **SAC** agent initially struggled with higher entropy exploration, with rewards dropping to nearly $-1000$ around 60k steps. However, it showed a clear upward trend in the final 30k steps, reaching **-866.27**. While the reward is lower than PPO at this stage, the trajectory suggests potential for continued improvement with more training steps.
+
+### 2. Qualitative Results
+We analyzed the agent's behavior through visual captures to identify failure modes and successes.
+
+![Baseline_PPO_gif](docs/images/PPO_baseline_resized.gif) 
+
+**Baseline PPO (Stagnation Mode)**: We observed that the Baseline PPO agent developed a "safe" but useless strategy of **spinning in place**. By doing so, it avoids crossing the lane boundaries and incurring the heavy $-100.0$ penalty, but it fails to make any forward progress.
+
+![Baseline_PPO_gif](docs/images/PPO_tuned_resized.gif)
+
+**Tuned PPO (Success Mode)**: 
+* **Dynamic Recovery**: Unlike the baseline models, the Tuned PPO agent demonstrates a sophisticated understanding of the environment by making continuous, fine-grained steering adjustments to stay centered.
+* **Effective Progress**: After reaching the convergence point, the agent overcame the "stagnation" trap; it actively moves forward with linear velocity while successfully interpreting the $64 \times 64$ RGB input to anticipate upcoming curves.
+* **Stability**: The agent maintains a stable trajectory even as training progresses, proving that our tuning effectively balanced exploration with exploitation.
+
+![Baseline_PPO_gif](docs/images/SAC_resized.gif)
+
+**SAC (Exploration Mode)**: The SAC agent currently exhibits **wandering behavior**, moving near the starting area but without a clear sense of direction. While it is more active than the Baseline PPO, it has not yet learned to correlate visual inputs with the long-term goal of lane following.
+
 
 
 ## Remaining Goals and Challenges
