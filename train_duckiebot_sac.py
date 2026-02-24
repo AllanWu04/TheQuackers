@@ -68,14 +68,14 @@ def make_duckiebot_env():
     return ImageWrapper(base_env)
 
 def main():
-    experiment_name = "DuckieBotSAC"
+    experiment_name = "DuckieBotSAC_500k_hyperparams"
     log_dir = f"duckiebot_logs/{experiment_name}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
 
     env = make_vec_env(make_duckiebot_env, n_envs=1)
 
     env = VecTransposeImage(env)
     env = VecFrameStack(env, n_stack=4)
-    video_trigger = lambda step: step % 1000 == 0
+    video_trigger = lambda step: step % 5000 == 0
 
     env = TensorboardVideoRecorder(env=env,
                                    video_trigger=video_trigger,
@@ -103,8 +103,8 @@ def main():
                ent_coef="auto",
                learning_rate=3e-4)
 
-    model.learn(total_timesteps=100_000)
-    model.save("duckiebot_sac_model")
+    model.learn(total_timesteps=500_000)
+    model.save("duckiebot_sac_500k_model")
 
 if __name__ == "__main__":
     main()
