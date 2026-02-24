@@ -18,7 +18,20 @@ Visual of Duckiebot undergoing training with PPO.
 
 Visual of Duckiebot undergoing training with SAC.
 
-# Source code: 
+# Resources
+### Libaries:
+- gym
+- numpy
+- stable_baselines3
+- tensorboard_video_recorder
+
+### Repository:
+- [Duckietown Unreal Engine](https://gitlab.jblanier.net/sim2real/duckiebotssim/-/tree/master)
+
+### Additional Resources:
+- [Stable-Baseline3 Documentation](https://stable-baselines3.readthedocs.io/en/master/)
+
+# Source code:
 https://github.com/AllanWu04/TheQuackers
 
 # Reports:
