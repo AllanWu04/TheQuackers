@@ -102,7 +102,7 @@ def test_model(model_name: str, n_episodes: int):
         ep_rew = 0.0
         ep_step = 0
         done = [False]
-        while not done[0] and ep < 200:
+        while not done[0] and ep_step < 200:
             action, _states = model.predict(obs, deterministic=True)
             obs, reward, done, info = env.step(action)
             ep_rew += reward[0]
