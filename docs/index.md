@@ -10,11 +10,11 @@ perform lane following. We hope to gain a deeper understanding of how to apply r
 intricate details of each algorithm to maximize the best results.
 
 # Visuals
-![Duckiebot with 700k training ppo](docs/imgs/700k_training_duckie.gif)
+![Duckiebot with 700k training ppo](https://github.com/AllanWu04/TheQuackers/blob/main/docs/imgs/700k_training_duckie.gif)
 
 Visual of Duckiebot undergoing training with PPO.
 
-![Duckiebot with SAC training 10k](docs/imgs/SAC_Spinning.gif)
+![Duckiebot with SAC training 10k](https://github.com/AllanWu04/TheQuackers/blob/main/docs/imgs/SAC_Spinning.gif)
 
 Visual of Duckiebot undergoing training with SAC.
 
