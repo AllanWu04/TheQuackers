@@ -1,10 +1,13 @@
 from datetime import datetime
 import gym
 import numpy as np
+import cv2
+import os
 from stable_baselines3 import PPO
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import DummyVecEnv, VecTransposeImage, VecFrameStack
+from stable_baselines3.common.callbacks import CheckpointCallback
 from tensorboard_video_recorder import TensorboardVideoRecorder
 from duckiebots_unreal_sim.holodeck_env import UEDuckiebotsHolodeckEnv
 from duckiebots_unreal_sim.holodeck_lane_following_env import UELaneFollowingEnv
@@ -68,14 +71,19 @@ def make_duckiebot_env() -> UELaneFollowingEnv:
 
 
 def main():
-    experiment_name = "DuckieBotPPO_100k_n_envs=1"
+    experiment_name = "DuckieBotPPO_500k_n_envs=1_with_cp"
     experiment_log_dir = f"duckiebot_logs/{experiment_name}{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
     env = make_vec_env(make_duckiebot_env, n_envs=1)
     print(f'The duckiebot action space: {env.action_space}')
     print(f'The duckiebot observation space: {env.observation_space}')
     env = VecTransposeImage(env)
     env = VecFrameStack(env, n_stack=4)
-    video_trigger = lambda step: step % 1000 == 0
+    video_trigger = lambda step: step % 10000 == 0
+    checkpoint = CheckpointCallback(save_freq=10_000,
+                                    save_path="./checkpoints/",
+                                    name_prefix="duckiebot_ppo",
+                                    verbose=1
+                                    )
     env = TensorboardVideoRecorder(env=env,
                                    video_trigger=video_trigger,
                                    video_length=500,
@@ -85,10 +93,17 @@ def main():
                 env=env,
                 verbose=1,
                 tensorboard_log=experiment_log_dir)
-    model.learn(total_timesteps=100_000)
-    model.save("duckiebot_ppo_test_100k_1envs")
+    try:
+        model.learn(total_timesteps=500_000, callback=checkpoint)
+        model.save("duckiebot_ppo_test_500k_1envs_with_cp")
+    except Exception as e:
+        model.save("duckiebot_crash_save")
+    finally:
+        env.close()
 
 def test_model(model_name: str, n_episodes: int):
+    experiment_name = "DuckieBotPPO_test_model"
+    os.makedirs(f'videos/{experiment_name}')
     env = make_vec_env(make_duckiebot_env, n_envs=1)
     env = VecTransposeImage(env)
     env = VecFrameStack(env, n_stack=4)
@@ -102,24 +117,29 @@ def test_model(model_name: str, n_episodes: int):
         ep_rew = 0.0
         ep_step = 0
         done = [False]
-        while not done[0] and ep_step < 200:
+        video_path = f'videos/{experiment_name}/ep_{ep}.mp4'
+        writer = cv2.VideoWriter(video_path, cv2.VideoWriter_fourcc(*'mp4v'), 20, (64, 64))
+        while not done[0] and ep_step < 500:
             action, _states = model.predict(obs, deterministic=True)
             obs, reward, done, info = env.step(action)
             ep_rew += reward[0]
             ep_step += 1
+            frame = env.env_method("render")[0]
+            writer.write(frame)
             print(f'Ep{ep} T{ep_step}: reward={reward[0]:.3f}', flush=True)
+        writer.release()
         ep_rews.append(ep_rew)
         ep_lens.append(ep_step)
         print(f'Episode {ep + 1}: reward={ep_rew:.2f}, steps={ep_step}', flush=True)
-
     print(f'\n--- Results over {n_episodes} episodes ---', flush=True)
     print(f'Mean reward:  {np.mean(ep_rews):.2f}', flush=True)
     print(f'Std reward:   {np.std(ep_rews):.2f}', flush=True)
     print(f'Mean steps:   {np.mean(ep_lens):.1f}', flush=True)
     print(f'Best episode: {np.max(ep_lens):.2f}', flush=True)
 
+
     env.close()
 
 if __name__ == "__main__":
     #main()
-    test_model("duckiebot_ppo_test_100k_1envs", 10)
+    test_model("duckiebot_crash_save", 1)
