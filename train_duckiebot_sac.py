@@ -100,10 +100,10 @@ def make_duckiebot_env():
 
 def main():
     seed_all(SEED)
-    experiment_name = "DuckieBotSAC_500k_default_buf50k_SEED"
+    experiment_name = "DuckieBotSAC_500k_hyperp3_2env_buf50k_SEED"
     log_dir = f"duckiebot_logs_SEED/{experiment_name}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
 
-    env = make_vec_env(make_duckiebot_env, n_envs=1, seed=SEED)
+    env = make_vec_env(make_duckiebot_env, n_envs=2, seed=SEED)
 
     env = VecTransposeImage(env)
     env = VecFrameStack(env, n_stack=4)
@@ -130,20 +130,14 @@ def main():
                 batch_size=128, #help with oom
                 seed=SEED,
                #hyperparamters
-               #buffer_size=200_000,
-               #learning_starts=10_000,
-               #batch_size=256,
-               #train_freq=1,
-               #gradient_steps=1,
-               #gamma=0.99,
-               #tau=0.005,
-               #ent_coef="auto",
-               #learning_rate=3e-4
+                learning_rate=1e-4,
+                learning_starts=10_000,
+                gamma=0.98,
                )
 
     try:
        model.learn(total_timesteps=500_000)
-       model.save("duckiebot_sac_500k_def_buff50k_model_seed")
+       model.save("duckiebot_sac_500k_hyperp3_2env_buff50k_model_seed")
     finally:
        env.close()
 
