@@ -48,10 +48,10 @@ class ImageWrapper(gym.Env):
        
        #reward weights
        self.bad_rew = -10.0
-       self.forward_weight = 2.0
-       self.align_weight = 1.0
-       self.smooth_weight = 0.5
-       self.spin_weight = 0.5
+       self.forward_weight = 4.0 #2.0
+       self.align_weight = 0.7 #1.0
+       self.smooth_weight = 0.2 #0.5
+       self.spin_weight = 0.2 #0.5
        
 
     def seed(self, seed=None):
@@ -97,16 +97,30 @@ class ImageWrapper(gym.Env):
             return self.bad_rew
         if action_velocity < -0.1:
             return self.bad_rew
-            
-        progress_reward = np.interp(forward_vel, (0.0, 1.0), (0.0, 1.0)) * self.forward_weight
+        
+        #reward forward motion more 
+        forward_clip = np.clip(forward_vel, 0.0, 1.0)
+        progress_reward = (forward_clip ** 2) * self.forward_weight
+        
+        #reward staying aligned, but not so much that it restricts movement
         alignment_reward = np.interp(abs(yaw_vel), (0.0, 1.0), (1.0, -1.0)) * self.align_weight
         
+        #smaller smoothness so it can be more decisive
         turn_change = abs(action_turning - self._last_action[1])
         smoothness_reward = np.interp(turn_change, (0.0, 2.0), (0.5, -0.5)) * self.smooth_weight
         
+        #smaller steering penatly so not scared to steer
         spin_penalty = abs(action_turning) * self.spin_weight
         
-        shaped_reward = progress_reward + alignment_reward + smoothness_reward - spin_penalty
+        #small penatly for crawling too slow
+        slow_penalty = 0.3 if forward_vel < 0.15 else 0.0
+        
+        shaped_reward = (progress_reward 
+                         + alignment_reward 
+                         + smoothness_reward 
+                         - spin_penalty
+                         - slow_penalty
+                         )
         
         return float(shaped_reward)
 
@@ -157,7 +171,7 @@ def make_duckiebot_env():
 
 def main():
     seed_all(SEED)
-    experiment_name = "DuckieBotSAC_500k_hyperp_custmrew_buf50k_SEED"
+    experiment_name = "DuckieBotSAC_500k_hyperp_custmrewforward_buf50k_SEED"
     log_dir = f"duckiebot_logs_CUSTM/{experiment_name}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
 
     env = make_vec_env(make_duckiebot_env, n_envs=1, seed=SEED)
@@ -195,7 +209,7 @@ def main():
 
     try:
        model.learn(total_timesteps=500_000)
-       model.save("duckiebot_sac_500k_hyperp_customrew_buff50k_model_seed")
+       model.save("duckiebot_sac_500k_hyperp_customrewforward_buff50k_model_seed")
     finally:
        env.close()
 
