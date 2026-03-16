@@ -16,68 +16,43 @@ class ImageWrapper(gym.Env):
     def __init__(self, env):
         super().__init__()
         self.env = env
-        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(64, 64, 3), dtype=np.uint8)
-        self.action_space = gym.spaces.Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float32)
+        self.observation_space = gym.spaces.Box(
+            low=0, high=255, shape=(64, 64, 3), dtype=np.uint8
+        )
+        self.action_space = gym.spaces.Box(
+            low=-1.0, high=1.0, shape=(2,), dtype=np.float32
+        )
         self.last_obs = None
         self._last_action = np.zeros(2, dtype=np.float32)
-        self._last_full_obs = None
-        self._timestep = 0
-        #Reward weights
-        self.bad_rew = -5.0 #Decreased from -10 to -5 so less crashing
-        self.forward_weight = 3.0 #forward movement (changed from 2 to 3)
-        self.align_weight = 1.5 #stay align with lane (changed from 1 to 1.5)
-        self.smooth_weight = 0.8 #smooth steer (increase from 0.5 to 0.8)
-        self.spin_weight = 0.4
 
     def seed(self, seed=None):
         return []
 
     def reset(self):
-        self._last_action = np.zeros(2, dtype=np.float32)
-        self._last_full_obs = None
-        self._timestep = 0
         obs = self.env.reset()
-        self._last_full_obs = obs
         image = obs['image'].astype(np.uint8)
         self.last_obs = image
+        self._last_action = np.zeros(2, dtype=np.float32)
         return image
-
-    def _custom_reward(self, base_reward, action):
-        my_reward = self.bad_rew
-        if (self._last_full_obs is None or self._timestep <= 1):
-            return 0.0
-        yaw_vel = self._last_full_obs['yaw_and_forward_vel'][0]
-        forward_vel = self._last_full_obs['yaw_and_forward_vel'][1]
-        action_velocity = action[0]
-        action_turning = action[1]
-        if base_reward <= -10.0:
-            return my_reward
-        if base_reward <= -10.0:
-            return my_reward
-        if forward_vel < -0.1:
-            return my_reward
-        if action_velocity < -0.1:
-            return my_reward
-        progress_reward = np.interp(forward_vel,(0.0, 1.0),(0.0, 1.0)) * self.forward_weight
-        alignment_reward = np.interp(abs(yaw_vel),(0.0, 1.0),(1.0, -1.0)) * self.align_weight
-        turn_change = abs(action_turning - self._last_action[1])
-        smoothness_reward = np.interp(turn_change,(0.0, 2.0),(0.5, -0.5)) * self.smooth_weight
-        spin_penalty = abs(action_turning) * self.spin_weight
-        momentum = 0.0
-        if forward_vel > 0.3 and abs(yaw_vel) < 0.3:
-            momentum = 0.2
-        my_reward = (progress_reward + alignment_reward + smoothness_reward + momentum - spin_penalty)
-        return float(my_reward)
 
     def step(self, action):
         obs, rew, done, info = self.env.step(action)
-        self._timestep += 1
-        self._last_full_obs = obs
-        shaped_reward = self._custom_reward(rew, action)
-        self._last_action = action.copy()
         image = obs['image'].astype(np.uint8)
         self.last_obs = image
-        return image, shaped_reward, done, info
+
+        forward_vel = action[0]
+        turning = action[1]     
+
+        spin_penalty = abs(turning) * 0.3
+
+        forward_bonus = max(0.0, forward_vel) * 0.1
+
+        turn_jerk = abs(turning - self._last_action[1]) * 0.1
+
+        shaped_rew = rew - spin_penalty + forward_bonus - turn_jerk
+        self._last_action = action
+
+        return image, float(shaped_rew), done, info
 
     def render(self, **kwargs):
         if self.last_obs is not None:
@@ -113,7 +88,7 @@ def make_duckiebot_env() -> UELaneFollowingEnv:
 
 
 def main():
-    experiment_name = "DuckieBotPPO_2M_n_envs=1_both_custrew_and_hyperparam_modified"
+    experiment_name = "DuckieBotPPO_2M_n_envs=1_hyperparams_customrew_simple"
     experiment_log_dir = f"duckiebot_logs/{experiment_name}{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
     env = make_vec_env(make_duckiebot_env, n_envs=1)
     print(f'The duckiebot action space: {env.action_space}')
@@ -125,7 +100,7 @@ def main():
                                     save_path="./checkpoints/",
                                     name_prefix="duckiebot_ppo",
                                     verbose=1
-                                    )
+                                   )
     env = TensorboardVideoRecorder(env=env,
                                    video_trigger=video_trigger,
                                    video_length=500,
@@ -135,20 +110,19 @@ def main():
                 env=env,
                 verbose=1,
                 tensorboard_log=experiment_log_dir,
-                learning_rate=3e-4,
-                n_steps=2048,
-                batch_size=128,
+                learning_rate=1e-4,
+                n_steps=1024,
+                batch_size=64,
                 n_epochs=10,
                 ent_coef=0.05,
-                )
-    #From 1e-4 to 3e-4, from 1024 to 2048, from 64 to 128
+               )
     try:
         model.learn(total_timesteps=2_000_000, callback=checkpoint)
-        model.save("duckieBotPPO_2M_n_envs=1_both_custrew_and_hyperparam_modified")
+        model.save("duckiebot_ppo_test_2M_1env_hyperparams_customrew_simple")
     except Exception as e:
-        model.save("duckieBotPPO_2M_n_envs=1_both_custrew_and_hyperparam_modified")
+        model.save("duckiebot_crash_save_2M_1env_hyperparams_customrew_simple")
     finally:
-        model.save("duckieBotPPO_2M_n_envs=1_both_custrew_and_hyperparam_modified")
+        model.save("duckiebot_ppo_test_2M_1envs_hyperparams_customrew_simple")
         env.close()
 
 def resume_training(model_name: str, total_step: int, stop_step: int):
@@ -164,7 +138,7 @@ def resume_training(model_name: str, total_step: int, stop_step: int):
                                     save_path="./checkpoints/",
                                     name_prefix="duckiebot_ppo",
                                     verbose=1
-                                    )
+                                   )
     env = TensorboardVideoRecorder(env=env,
                                    video_trigger=video_trigger,
                                    video_length=500,
@@ -175,7 +149,7 @@ def resume_training(model_name: str, total_step: int, stop_step: int):
     model.learn(total_timesteps=remain_step, callback=checkpoint, reset_num_timesteps=False)
 
 def test_model(model_name: str, n_episodes: int):
-    experiment_name = "DuckieBotPPO_test_model"
+    experiment_name = "DuckieBotPPO_test_model_simple_rew"
     os.makedirs(f'videos/{experiment_name}')
     env = make_vec_env(make_duckiebot_env, n_envs=1)
     env = VecTransposeImage(env)
@@ -211,10 +185,10 @@ def test_model(model_name: str, n_episodes: int):
     print(f'Mean steps:   {np.mean(ep_lens):.1f}', flush=True)
     print(f'Best episode: {np.max(ep_lens):.2f}', flush=True)
 
-
+    
     env.close()
 
 if __name__ == "__main__":
     main()
     #resume_training("duckiebot_crash_save_500k_4env_hyperparams_customrew", 500_000, 455_640)
-    #test_model("duckiebot_crash_save_500k_4env_hyperparams_customrew", 1)
+    #test_model("duckiebot_ppo_test_1M_1env_hyperparams_customrew_simple", 1)
