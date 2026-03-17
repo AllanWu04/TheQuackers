@@ -14,6 +14,8 @@ A 160x120 RGB visual feed is the primary input for the Duckiebot and provides th
 Based on the camera feed the system produces a continuous output in the form of linear and angular velocity commands to control the Duckiebot's movement, allowing it to navigate the field safely and responsivley.
 Aiming to transfer the training agent to the physical Duckiebot we are comparing different RL algorithms to compare and discover which will give us the best result. 
 
+---
+
 ## Approach
 
 Our team implemented and compared two distinct reinforcement learning approaches for autonomous driving in the Duckiebot simulator to identify the most robust solution for continuous action spaces. We focused on comparing an on-policy method, **Proximal Policy Optimization (PPO)**, with an off-policy method, **Soft Actor-Critic (SAC)**.
@@ -49,7 +51,6 @@ We implemented a custom `ImageWrapper` to refine the reward signal, transitionin
 * **Momentum Bonus**: A $+0.2$ bonus applied when `forward_vel > 0.3` and `abs(yaw_vel) < 0.3` to encourage stable, high-speed lane following.
 * **Termination**: A large penalty ($-5.0$ to $-100.0$ depending on the version) and episode termination upon collision with lane boundaries.
 
----
 
 ### Hyperparameter Configurations
 
@@ -83,53 +84,66 @@ Our final PPO configuration focused on increasing the batch size and learning ra
 **PPO Tuning Process:**
 The primary challenge with PPO was the "stagnation trap," where the agent would spin in place to avoid collision penalties. By increasing the entropy coefficient ($ent\_coef$) to $0.05$ and adjusting the reward weights for forward progress, we forced the agent to explore the lane boundaries more effectively.
 
+---
+
 ## Evaluation
-We evaluated our three configurations based on quantitative training logs and qualitative driving performance.
 
-### 1. Quantitative Results
-The training progress revealed distinct learning behaviors across the three configurations:
+We evaluated our PPO and SAC configurations across four distinct training attempts for each algorithm, measuring performance through quantitative reward metrics and qualitative behavioral analysis in the DuckieTown simulator.
 
-| Metric | Baseline PPO | Tuned PPO | SAC |
-| :--- | :--- | :--- | :--- |
-| **Final Smoothed Reward** | -434.38 | **-274.10** | -866.27 |
-| **Training Steps** | 100,352 | 352,256 | 98,758 |
-| **Recovery Status** | Partial / Plateau | **Significant Breakthrough** | Early Stabilization |
+### 1. Proximal Policy Optimization (PPO) Evaluation
 
-#### Baseline PPO Performance:
-<img src="imgs/PPO_baseline.png" alt="PPO Rew Curve" width="800" height="500">
+The PPO training evolved from baseline establishment to late-stage refinement using custom reward functions.
 
-The **Baseline PPO** showed an early struggle, with the reward dropping nearly to $-750$ within 20k steps. While it recovered to around $-180$ mid-training, it eventually decayed and plateaued at **-434.38**, indicating it failed to find a long-term stable policy for the environment.
+#### Early/Mid-Stage Training (Baseline and Initial Tuning)
+* **Model 1 (Baseline)**: Utilizing 100,000 training steps and default hyperparameters, this model achieved a reward value of **-468.3351**.
+* **Model 2 (Initial Tuning)**: Training was extended to 500,000 steps with a learning rate of $1 \times 10^{-4}$ and an entropy coefficient of $0.05$. This configuration resulted in a reward value of **-456.0184**.
 
-#### Tuned PPO Performance:
-<img src="imgs/PPO_tuned.png" alt="PPO Tuned Rew Curve" width="800" height="500">  
+<img src="imgs/PPO_1&2.png" alt="PPO Rew Curve" width="800" height="500">
 
-Our **Tuned PPO** demonstrated a superior recovery capability. After an extensive exploration phase that dipped to $-700$, the agent achieved a major breakthrough around **260k steps**. It stabilized at a significantly higher smoothed reward of **-274.10**, proving that our hyperparameter adjustments directly improved the agent's ability to learn from road boundary penalties.
-
-#### SAC Performance:
-<img src="imgs/SAC_plot.png" alt="SAC Rew Curve" width="800" height="500">
-
-The **SAC** agent initially struggled with higher entropy exploration, with rewards dropping to nearly $-1000$ around 60k steps. However, it showed a clear upward trend in the final 30k steps, reaching **-866.27**. While the reward is lower than PPO at this stage, the trajectory suggests potential for continued improvement with more training steps.
-
-### 2. Qualitative Results
-We analyzed the agent's behavior through visual captures to identify failure modes and successes.
-
-![Baseline_PPO_gif](imgs/PPO_baseline_resized.gif) 
-
-**Baseline PPO (Stagnation Mode)**: We observed that the Baseline PPO agent developed a "safe" but useless strategy of **spinning in place**. By doing so, it avoids crossing the lane boundaries and incurring the heavy $-100.0$ penalty, but it fails to make any forward progress.
-
-![Baseline_PPO_gif](imgs/PPO_tuned_resized.gif)
-
-**Tuned PPO (Success Mode)**: 
-* **Dynamic Recovery**: Unlike the baseline models, the Tuned PPO agent demonstrates a sophisticated understanding of the environment by making continuous, fine-grained steering adjustments to stay centered.
-* **Effective Progress**: After reaching the convergence point, the agent overcame the "stagnation" trap; it actively moves forward with linear velocity while successfully interpreting the $64 \times 64$ RGB input to anticipate upcoming curves.
-* **Stability**: The agent maintains a stable trajectory even as training progresses, proving that our tuning effectively balanced exploration with exploitation.
-
-![Baseline_PPO_gif](imgs/SAC_resized.gif)
-
-**SAC (Exploration Mode)**: The SAC agent currently exhibits **wandering behavior**, moving near the starting area but without a clear sense of direction. While it is more active than the Baseline PPO, it has not yet learned to correlate visual inputs with the long-term goal of lane following.
+|  ![PPO1_gif](imgs/PPO1.gif)  | ![PPO2_gif](imgs/PPO2.gif) |
+|:----------------------------:|:--------------------------:|
+|      Model 1 (Baseline)      |          Model 2 (Initial Tuning)          |
 
 
+#### Late-Stage Training (Reward Refinement)
+* **Model 3 (Extended Training with Simple Reward)**: With 1,000,000 training steps and the "simple" reward function, performance improved to a reward of **-141.3634**.
+* **Model 4 (Optimized Custom Reward)**: Maintaining the same hyperparameters as Model 3 but implementing a "custom" reward function, the agent achieved a breakthrough positive reward of **83.9519**. This version demonstrated the most stable and centered lane-following behavior.
+<img src="imgs/PPO_3&4.png" alt="PPO Rew Curve" width="800" height="500">
 
+|            ![PPO3_gif](imgs/PPO3.gif)            | ![PPO4_gif](imgs/PPO4.gif) |
+|:------------------------------------------------:|:--------------------------:|
+|  Model 3 (Extended Training with Simple Reward)  | Model 4 (Optimized Custom Reward) |
+
+### 2. Soft Actor-Critic (SAC) Evaluation
+
+SAC evaluation focused on overcoming hardware constraints and exploration issues through seeding and hyperparameter modification.
+
+#### Early Stage (Baseline and Modified Parameters)
+* **Model 1 (Default SAC)**: Using default parameters over 100,000 timesteps, the agent achieved an initial reward of **-418.5**.
+* **Model 2 (Modified Hyperparameters)**: Training was extended to 500,000 timesteps with an increased learning rate of $3 \times 10^{-4}$ and a buffer size of 200,000. This configuration initially struggled, resulting in a reward of **-2551**.
+
+<img src="imgs/SAC_1&2.png" alt="PPO Rew Curve" width="800" height="500">
+
+|  ![SAC1_gif](imgs/SAC1.gif)  | ![SAC2_gif](imgs/SAC2.gif) |
+|:----------------------------:|:--------------------------:|
+|    Model 1 (Default SAC)     |  Model 2 (Modified Hyperparameters)  |
+#### Mid and Final Stages (Seeding and Custom Rewards)
+* **Model 3 (Mid-Stage SEEDING)**: To stabilize training, domain randomization and camera location randomization were disabled. With a smaller buffer size (50,000) and lower learning rate ($1 \times 10^{-4}$), the model reached a reward of **1514**.
+* **Model 4 (Final Stage Custom Reward)**: Building on the seeded environment, a custom reward function was applied. There are two runs. The "Gray" run achieved the highest SAC reward of **2493**, while the "Orange" run (with modified forward weighting) achieved **1403**.
+
+<img src="imgs/SAC_3.png" alt="PPO Rew Curve" width="800" height="500">
+<img src="imgs/SAC_4&5.png" alt="PPO Rew Curve" width="800" height="500">
+
+| ![SAC3_gif](imgs/SAC3.gif)  |       ![SAC4_gif](imgs/SAC4.gif)        |          ![SAC5_gif](imgs/SAC5.gif)          |
+|:---------------------------:|:---------------------------------------:|:--------------------------------------------:|
+| Model 3 (Mid-Stage SEEDING) | Model 4 (Final Stage Custom Reward / Gray ) | Model 4 (Final Stage Custom Reward / Orange) |
+
+### Final Comparison and Insights
+* **Behavioral Progression**: Baseline models often fell into the "stagnation trap," spinning in place to avoid penalties. Policy refinement and custom reward shaping were essential to achieving consistent forward progress and trajectory smoothness.
+* **Training Stability**: PPO demonstrated more consistent convergence during late-stage refinement compared to SAC, which showed higher sensitivity to buffer sizes and learning starts.
+* **Performance Peak**: Model 4 for PPO (using 1,000,000 steps and custom rewards) and Model 3 for SAC (Mid-Stage SEEDING) represented the most successful configurations for autonomous navigation.
+
+---
 
 ## Resources Used
 - SAC Documentation: https://stable-baselines3.readthedocs.io/en/master/modules/sac.html
