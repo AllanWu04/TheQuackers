@@ -43,14 +43,23 @@ Where $\mathcal{H}$ denotes the entropy and $\alpha$ is the temperature paramete
 * **Actions**: A continuous space representing `[linear_velocity, angular_velocity]`, with both values clipped between $[-1.0, 1.0]$.
 
 #### 2. Advanced Reward Shaping
-We implemented a custom `ImageWrapper` to refine the reward signal, transitioning from basic penalties to a sophisticated multi-weighted function:
-* **Progress (Weight: 3.0)**: Positive reward based on `forward_vel` to encourage forward movement and overcome the "stagnation trap" of spinning in place.
-* **Alignment (Weight: 1.5)**: Penalty based on `yaw_vel` to keep the Duckiebot aligned with the lane center.
-* **Smoothness (Weight: 0.8)**: Penalty applied to the magnitude of steering changes (`turn_jerk`) to prevent aggressive "wobbling."
-* **Spin Penalty (Weight: 0.4)**: Specifically penalizes high angular velocity to discourage the agent from simply rotating to avoid collision rewards.
-* **Momentum Bonus**: A $+0.2$ bonus applied when `forward_vel > 0.3` and `abs(yaw_vel) < 0.3` to encourage stable, high-speed lane following.
-* **Termination**: A large penalty ($-5.0$ to $-100.0$ depending on the version) and episode termination upon collision with lane boundaries.
 
+We implemented a custom `ImageWrapper` to refine the reward signal, transitioning from a basic set of heuristics to a sophisticated multi-weighted function to improve driving stability.
+
+#### Configuration A: Simple Reward Function
+The simple reward function was designed to provide basic corrections to the agent's movement by penalizing erratic behavior and rewarding forward intent.
+* **Spin Penalty**: Penalizes the absolute value of the turning action by a factor of $0.3$ to discourage spinning.
+* **Forward Bonus**: Provides a small incentive ($0.1 \times forward\_vel$) for positive forward velocity to encourage movement.
+* **Turn Jerk**: Penalizes the difference between the current and previous turning actions by $0.1$ to encourage smoother steering and reduce jitter.
+
+#### Configuration B: Custom Reward Function (Optimized)
+The optimized custom reward function introduced more granular weights and environmental context to achieve stable lane following.
+* **Progress (Weight: 3.0)**: Uses interpolation on the agent's actual forward velocity to provide a strong positive incentive for moving forward, helping the agent overcome the "stagnation trap."
+* **Alignment (Weight: 1.5)**: Penalizes high yaw velocity to keep the Duckiebot parallel with the lane center, ensuring it follows the road's curve rather than driving into boundaries.
+* **Smoothness (Weight: 0.8)**: Scales the steering change penalty to significantly reduce aggressive "wobbling" during navigation.
+* **Spin Penalty (Weight: 0.4)**: Specifically targets angular velocity to ensure the agent does not default to circular motion to avoid boundaries.
+* **Momentum Bonus**: An additional $+0.2$ reward is applied when the agent maintains a $forward\_vel > 0.3$ while keeping $abs(yaw\_vel) < 0.3$, rewarding high-speed stability on straightaways.
+* **Termination**: A large penalty (ranging from $-5.0$ to $-100.0$ depending on the specific model run) and episode termination are applied immediately upon collision with lane boundaries.
 
 ### Hyperparameter Configurations
 
