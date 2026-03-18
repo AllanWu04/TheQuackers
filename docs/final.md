@@ -14,6 +14,16 @@ A 160x120 RGB visual feed is the primary input for the Duckiebot and provides th
 Based on the camera feed the system produces a continuous output in the form of linear and angular velocity commands to control the Duckiebot's movement, allowing it to navigate the field safely and responsivley.
 Aiming to transfer the training agent to the physical Duckiebot we are comparing different RL algorithms to compare and discover which will give us the best result. 
 
+The main challenge of this project is understanding how the Duckiebot interacts with the environment and establishing a way to enforce that the bot follows specific road rules
+in its continuous state of movement. When launching the environment, the Duckiebot will randomly move in any direction without understanding whether moving that way was a bad or good decision.
+With the unlimited possiblities of how the Duckiebot can move and its continuously changing position, we decided that utilizing RL algorithms would be the best and most practical approach to having the bot 
+learn how to properly navigate the environment.
+
+The main reason behind using AI/ML algorithms is that autonomous driving requires you to account for precise road rules while handling unpredictable conditions in the environment. For our Duckiebot, 
+it must understand how to drive on the center of the road while accounting for the road curving left or right. This means that we must find a way to make the Duckiebot learn what the center of the road is 
+and when the road is about to end, while encouraging it to move forward. Programming all these factors manually would be impractical, resulting in RL algorithms being the smarter choice to solve
+this problem.
+
 ---
 
 ## Approach
@@ -157,6 +167,7 @@ SAC evaluation focused on overcoming hardware constraints and exploration issues
 ## Resources Used
 - SAC Documentation: https://stable-baselines3.readthedocs.io/en/master/modules/sac.html
 - PPO Documentation: https://stable-baselines3.readthedocs.io/en/master/modules/ppo.html
+- Custom Reward: https://github.com/marton12050/T.T-duckietown
 - duckiebotssim : https://gitlab.jblanier.net/sim2real/duckiebotssim/-/tree/master
 - AI Tools: We utilized Generative AI tools (Gemini/ChatGPT) to assist in debugging the `duckiebotssim` environment wrappers and to troubleshoot errors within our reinforcement learning training scripts.
 
