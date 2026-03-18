@@ -79,7 +79,7 @@ We evolved our hyperparameters across multiple training runs to find the best ba
 Our final PPO configuration focused on increasing the batch size and learning rate to handle the high-dimensional input from the $64 \times 64 \times 3$ image wrapper.
 
 <table style="width: 100%; border-collapse: collapse;">
-  <tr style="background-color: #161b22;">
+  <tr style="background-color: #161b22; color: #ffffff;">
     <th align="left" style="border: 1px solid #30363d; padding: 12px;">Hyperparameter</th>
     <th align="left" style="border: 1px solid #30363d; padding: 12px;">Value</th>
     <th align="left" style="border: 1px solid #30363d; padding: 12px;">Rationale</th>
@@ -118,7 +118,7 @@ The primary challenge with PPO was the "stagnation trap," where the agent would 
 Our final PPO configuration focused on increasing the batch size and learning rate to handle the high-dimensional input from the $64 \times 64 \times 3$ image wrapper.
 
 <table style="width: 100%; border-collapse: collapse;">
-  <tr style="background-color: #161b22;">
+  <tr style="background-color: #161b22; color: #ffffff;">
     <th align="left" style="border: 1px solid #30363d; padding: 12px;">Hyperparameter</th>
     <th align="left" style="border: 1px solid #30363d; padding: 12px;">Value</th>
     <th align="left" style="border: 1px solid #30363d; padding: 12px;">Rationale</th>
@@ -178,7 +178,7 @@ The PPO training evolved from baseline establishment to late-stage refinement us
       <img src="imgs/PPO2.gif" alt="PPO2_gif" style="width: 100%; max-width: 400px;">
     </td>
   </tr>
-  <tr style="background-color: #161b22;">
+  <tr style="background-color: #161b22; color: #ffffff;">
     <td align="center" style="border: 1px solid #30363d; padding: 8px;">
       <b>Model 1 (Baseline)</b>
     </td>
@@ -202,7 +202,7 @@ The PPO training evolved from baseline establishment to late-stage refinement us
       <img src="imgs/PPO4.gif" alt="PPO4_gif" style="width: 100%; max-width: 400px;">
     </td>
   </tr>
-  <tr style="background-color: #161b22;">
+  <tr style="background-color: #161b22; color: #ffffff;">
     <td align="center" style="border: 1px solid #30363d; padding: 8px;">
       <b>Model 3 (Extended Training with Simple Reward)</b>
     </td>
@@ -231,7 +231,7 @@ SAC evaluation focused on overcoming hardware constraints and exploration issues
       <img src="imgs/SAC2.gif" alt="SAC2_gif" style="width: 100%; max-width: 400px;">
     </td>
   </tr>
-  <tr style="background-color: #161b22;">
+  <tr style="background-color: #161b22; color: #ffffff;">
     <td align="center" style="border: 1px solid #30363d; padding: 8px;">
       <b>Model 1 (Default SAC)</b>
     </td>
@@ -246,6 +246,7 @@ SAC evaluation focused on overcoming hardware constraints and exploration issues
 * **Model 4 (Final Stage Custom Reward)**: Building on the seeded environment, a custom reward function was applied. There are two runs. The "Gray" run achieved the highest SAC reward of **2493**, while the "Orange" run (with modified forward weighting) achieved **1403**.
 
 <img src="imgs/SAC_3.png" alt="PPO Rew Curve" width="800" height="500">
+<p></p>
 <img src="imgs/SAC_4&5.png" alt="PPO Rew Curve" width="800" height="500">
 
 <table style="width: 100%; border-collapse: collapse;">
@@ -260,7 +261,7 @@ SAC evaluation focused on overcoming hardware constraints and exploration issues
       <img src="imgs/SAC5.gif" alt="SAC5_gif" style="width: 100%; max-width: 300px;">
     </td>
   </tr>
-  <tr style="background-color: #161b22;">
+  <tr style="background-color: #161b22; color: #ffffff;">
     <td align="center" style="border: 1px solid #30363d; padding: 8px;">
       <b>Model 3 (Mid-Stage SEEDING)</b>
     </td>
