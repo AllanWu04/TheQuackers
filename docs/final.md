@@ -115,7 +115,7 @@ Our final PPO configuration focused on increasing the batch size and learning ra
 The primary challenge with PPO was the "stagnation trap," where the agent would spin in place to avoid collision penalties. By increasing the entropy coefficient ($ent\_coef$) to $0.05$ and adjusting the reward weights for forward progress, we forced the agent to explore the lane boundaries more effectively.
 
 #### 2. Soft Actor-Critic (SAC)
-Our final PPO configuration focused on increasing the batch size and learning rate to handle the high-dimensional input from the $64 \times 64 \times 3$ image wrapper.
+Our SAC configuration focused on balancing sample efficiency, stability, and memory constraints while traning on high-dimensional image observations. Due to memory limits we adjusted key hyperparameters to prevent crashes while maintaining stable learning behaviour.
 
 <table style="width: 100%; border-collapse: collapse;">
   <tr style="background-color: #161b22; color: #ffffff;">
@@ -124,34 +124,43 @@ Our final PPO configuration focused on increasing the batch size and learning ra
     <th align="left" style="border: 1px solid #30363d; padding: 12px;">Rationale</th>
   </tr>
   <tr>
-    <td style="border: 1px solid #30363d; padding: 10px;"><b>Learning Rate</b></td>
-    <td style="border: 1px solid #30363d; padding: 10px;">3 × 10<sup>-4</sup></td>
-    <td style="border: 1px solid #30363d; padding: 10px;">Increased from 1 × 10<sup>-4</sup> to accelerate convergence with custom rewards.</td>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>learning_rate</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">1 × 10<sup>-4</sup></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Lowered from 3 × 10<sup>-4</sup> to stabalize training with noisy image observations.</td>
   </tr>
   <tr>
-    <td style="border: 1px solid #30363d; padding: 10px;"><b>n_steps</b></td>
-    <td style="border: 1px solid #30363d; padding: 10px;">2048</td>
-    <td style="border: 1px solid #30363d; padding: 10px;">Increased from 1024 to provide more stable gradient estimates per update.</td>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>buffer_size</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">50,000</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Reduced to prevent out-of-memory (OOM) issues during long training runs.</td>
   </tr>
   <tr>
-    <td style="border: 1px solid #30363d; padding: 10px;"><b>Batch Size</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>batch_size</b></td>
     <td style="border: 1px solid #30363d; padding: 10px;">128</td>
-    <td style="border: 1px solid #30363d; padding: 10px;">Increased from 64 to improve update stability in continuous action spaces.</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Decreased from default 256 to reduce memory usage while mantaining stable updates.</td>
   </tr>
   <tr>
-    <td style="border: 1px solid #30363d; padding: 10px;"><b>ent_coef</b></td>
-    <td style="border: 1px solid #30363d; padding: 10px;">0.05</td>
-    <td style="border: 1px solid #30363d; padding: 10px;">Set high to ensure the agent explored forward movement instead of spinning.</td>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>learning_starts</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">10,000</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Delays training to ensure the replay buffer has sufficient diverse samples.</td>
+  </tr>
+   <tr>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>gamma</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">0.98</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">SLightly reduced to priorotize more immediate rewards and imporve stability.</td>
   </tr>
   <tr>
     <td style="border: 1px solid #30363d; padding: 10px;"><b>Total Timesteps</b></td>
-    <td style="border: 1px solid #30363d; padding: 10px;">2,000,000</td>
-    <td style="border: 1px solid #30363d; padding: 10px;">Extended training duration to ensure behavior stabilization.</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">500,000</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Limited by compute and memory constraints but sufficient to observe convergence.</td>
   </tr>
 </table>
 
-**PPO Tuning Process:**
-The primary challenge with PPO was the "stagnation trap," where the agent would spin in place to avoid collision penalties. By increasing the entropy coefficient ($ent\_coef$) to $0.05$ and adjusting the reward weights for forward progress, we forced the agent to explore the lane boundaries more effectively.
+**SAC Tuning Process:**
+The primary challenge with SAC was "memory constraints", as larger replay buffers and batch sizes led to OOM crashes. Reducing the buffer size and batch size allowed for stable, longer training runs without exceeding hardware limits.
+
+With insability in early training we lowered the learning rate and introduced a longer delay before updates. This ensured that the agent learned from a wide set of experiences. Slightly reducing the discount factor, gamma, also helped the agent focus more on immediate rewards, improving short-term control and lane-following behavior.
+
+Wanting to ensure reproducibility, we fixed the random seed across runs. While stabalizing the action sampling, minor variations in observations remained due to the nature of the simulated enviorment.
 
 ---
 
