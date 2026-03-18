@@ -78,13 +78,38 @@ We evolved our hyperparameters across multiple training runs to find the best ba
 #### 1. Proximal Policy Optimization (PPO)
 Our final PPO configuration focused on increasing the batch size and learning rate to handle the high-dimensional input from the $64 \times 64 \times 3$ image wrapper.
 
-| Hyperparameter | Value | Rationale |
-| :--- | :--- | :--- |
-| **Learning Rate** | $3 \times 10^{-4}$ | Increased from $1 \times 10^{-4}$ to accelerate convergence with custom rewards. |
-| **n_steps** | $2048$ | Increased from $1024$ to provide more stable gradient estimates per update. |
-| **Batch Size** | $128$ | Increased from $64$ to improve update stability in continuous action spaces. |
-| **ent_coef** | $0.05$ | Set high to ensure the agent explored forward movement instead of spinning. |
-| **Total Timesteps** | $2,000,000$ | Extended training duration to ensure behavior stabilization. |
+<table style="width: 100%; border-collapse: collapse;">
+  <tr style="background-color: #161b22;">
+    <th align="left" style="border: 1px solid #30363d; padding: 12px;">Hyperparameter</th>
+    <th align="left" style="border: 1px solid #30363d; padding: 12px;">Value</th>
+    <th align="left" style="border: 1px solid #30363d; padding: 12px;">Rationale</th>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>Learning Rate</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">3 × 10<sup>-4</sup></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Increased from 1 × 10<sup>-4</sup> to accelerate convergence with custom rewards.</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>n_steps</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">2048</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Increased from 1024 to provide more stable gradient estimates per update.</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>Batch Size</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">128</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Increased from 64 to improve update stability in continuous action spaces.</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>ent_coef</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">0.05</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Set high to ensure the agent explored forward movement instead of spinning.</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>Total Timesteps</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">2,000,000</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Extended training duration to ensure behavior stabilization.</td>
+  </tr>
+</table>
 
 **PPO Tuning Process:**
 The primary challenge with PPO was the "stagnation trap," where the agent would spin in place to avoid collision penalties. By increasing the entropy coefficient ($ent\_coef$) to $0.05$ and adjusting the reward weights for forward progress, we forced the agent to explore the lane boundaries more effectively.
@@ -92,13 +117,38 @@ The primary challenge with PPO was the "stagnation trap," where the agent would 
 #### 2. Soft Actor-Critic (SAC)
 Our final PPO configuration focused on increasing the batch size and learning rate to handle the high-dimensional input from the $64 \times 64 \times 3$ image wrapper.
 
-| Hyperparameter | Value | Rationale |
-| :--- | :--- | :--- |
-| **Learning Rate** | $3 \times 10^{-4}$ | Increased from $1 \times 10^{-4}$ to accelerate convergence with custom rewards. |
-| **n_steps** | $2048$ | Increased from $1024$ to provide more stable gradient estimates per update. |
-| **Batch Size** | $128$ | Increased from $64$ to improve update stability in continuous action spaces. |
-| **ent_coef** | $0.05$ | Set high to ensure the agent explored forward movement instead of spinning. |
-| **Total Timesteps** | $2,000,000$ | Extended training duration to ensure behavior stabilization. |
+<table style="width: 100%; border-collapse: collapse;">
+  <tr style="background-color: #161b22;">
+    <th align="left" style="border: 1px solid #30363d; padding: 12px;">Hyperparameter</th>
+    <th align="left" style="border: 1px solid #30363d; padding: 12px;">Value</th>
+    <th align="left" style="border: 1px solid #30363d; padding: 12px;">Rationale</th>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>Learning Rate</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">3 × 10<sup>-4</sup></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Increased from 1 × 10<sup>-4</sup> to accelerate convergence with custom rewards.</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>n_steps</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">2048</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Increased from 1024 to provide more stable gradient estimates per update.</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>Batch Size</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">128</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Increased from 64 to improve update stability in continuous action spaces.</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>ent_coef</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">0.05</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Set high to ensure the agent explored forward movement instead of spinning.</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #30363d; padding: 10px;"><b>Total Timesteps</b></td>
+    <td style="border: 1px solid #30363d; padding: 10px;">2,000,000</td>
+    <td style="border: 1px solid #30363d; padding: 10px;">Extended training duration to ensure behavior stabilization.</td>
+  </tr>
+</table>
 
 **PPO Tuning Process:**
 The primary challenge with PPO was the "stagnation trap," where the agent would spin in place to avoid collision penalties. By increasing the entropy coefficient ($ent\_coef$) to $0.05$ and adjusting the reward weights for forward progress, we forced the agent to explore the lane boundaries more effectively.
@@ -119,19 +169,48 @@ The PPO training evolved from baseline establishment to late-stage refinement us
 
 <img src="imgs/PPO_1&2.png" alt="PPO Rew Curve" width="800" height="500">
 
-|  ![PPO1_gif](imgs/PPO1.gif)  | ![PPO2_gif](imgs/PPO2.gif) |
-|:----------------------------:|:--------------------------:|
-|      Model 1 (Baseline)      |  Model 2 (Initial Tuning)  |
-
+<table style="width: 100%; border-collapse: collapse;">
+  <tr>
+    <td align="center" style="border: 1px solid #30363d; padding: 10px; width: 50%;">
+      <img src="imgs/PPO1.gif" alt="PPO1_gif" style="width: 100%; max-width: 400px;">
+    </td>
+    <td align="center" style="border: 1px solid #30363d; padding: 10px; width: 50%;">
+      <img src="imgs/PPO2.gif" alt="PPO2_gif" style="width: 100%; max-width: 400px;">
+    </td>
+  </tr>
+  <tr style="background-color: #161b22;">
+    <td align="center" style="border: 1px solid #30363d; padding: 8px;">
+      <b>Model 1 (Baseline)</b>
+    </td>
+    <td align="center" style="border: 1px solid #30363d; padding: 8px;">
+      <b>Model 2 (Initial Tuning)</b>
+    </td>
+  </tr>
+</table>
 
 #### Late-Stage Training (Reward Refinement)
 * **Model 3 (Extended Training with Simple Reward)**: With 1,000,000 training steps and the "simple" reward function, performance improved to a reward of **-141.3634**.
 * **Model 4 (Optimized Custom Reward)**: Maintaining the same hyperparameters as Model 3 but implementing a "custom" reward function, the agent achieved a breakthrough positive reward of **83.9519**. This version demonstrated the most stable and centered lane-following behavior.
 <img src="imgs/PPO_3&4.png" alt="PPO Rew Curve" width="800" height="500">
 
-|            ![PPO3_gif](imgs/PPO3.gif)            | ![PPO4_gif](imgs/PPO4.gif) |
-|:------------------------------------------------:|:--------------------------:|
-|  Model 3 (Extended Training with Simple Reward)  | Model 4 (Optimized Custom Reward) |
+<table style="width: 100%; border-collapse: collapse;">
+  <tr>
+    <td align="center" style="border: 1px solid #30363d; padding: 10px; width: 50%;">
+      <img src="imgs/PPO3.gif" alt="PPO3_gif" style="width: 100%; max-width: 400px;">
+    </td>
+    <td align="center" style="border: 1px solid #30363d; padding: 10px; width: 50%;">
+      <img src="imgs/PPO4.gif" alt="PPO4_gif" style="width: 100%; max-width: 400px;">
+    </td>
+  </tr>
+  <tr style="background-color: #161b22;">
+    <td align="center" style="border: 1px solid #30363d; padding: 8px;">
+      <b>Model 3 (Extended Training with Simple Reward)</b>
+    </td>
+    <td align="center" style="border: 1px solid #30363d; padding: 8px;">
+      <b>Model 4 (Optimized Custom Reward)</b>
+    </td>
+  </tr>
+</table>
 
 ### 2. Soft Actor-Critic (SAC) Evaluation
 
@@ -143,9 +222,25 @@ SAC evaluation focused on overcoming hardware constraints and exploration issues
 
 <img src="imgs/SAC_1&2.png" alt="PPO Rew Curve" width="800" height="500">
 
-|  ![SAC1_gif](imgs/SAC1.gif)  | ![SAC2_gif](imgs/SAC2.gif) |
-|:----------------------------:|:--------------------------:|
-|    Model 1 (Default SAC)     |  Model 2 (Modified Hyperparameters)  |
+<table style="width: 100%; border-collapse: collapse;">
+  <tr>
+    <td align="center" style="border: 1px solid #30363d; padding: 10px; width: 50%;">
+      <img src="imgs/SAC1.gif" alt="SAC1_gif" style="width: 100%; max-width: 400px;">
+    </td>
+    <td align="center" style="border: 1px solid #30363d; padding: 10px; width: 50%;">
+      <img src="imgs/SAC2.gif" alt="SAC2_gif" style="width: 100%; max-width: 400px;">
+    </td>
+  </tr>
+  <tr style="background-color: #161b22;">
+    <td align="center" style="border: 1px solid #30363d; padding: 8px;">
+      <b>Model 1 (Default SAC)</b>
+    </td>
+    <td align="center" style="border: 1px solid #30363d; padding: 8px;">
+      <b>Model 2 (Modified Hyperparameters)</b>
+    </td>
+  </tr>
+</table>
+
 #### Mid and Final Stages (Seeding and Custom Rewards)
 * **Model 3 (Mid-Stage SEEDING)**: To stabilize training, domain randomization and camera location randomization were disabled. With a smaller buffer size (50,000) and lower learning rate ($1 \times 10^{-4}$), the model reached a reward of **1514**.
 * **Model 4 (Final Stage Custom Reward)**: Building on the seeded environment, a custom reward function was applied. There are two runs. The "Gray" run achieved the highest SAC reward of **2493**, while the "Orange" run (with modified forward weighting) achieved **1403**.
@@ -153,9 +248,30 @@ SAC evaluation focused on overcoming hardware constraints and exploration issues
 <img src="imgs/SAC_3.png" alt="PPO Rew Curve" width="800" height="500">
 <img src="imgs/SAC_4&5.png" alt="PPO Rew Curve" width="800" height="500">
 
-| ![SAC3_gif](imgs/SAC3.gif)  |       ![SAC4_gif](imgs/SAC4.gif)        |          ![SAC5_gif](imgs/SAC5.gif)          |
-|:---------------------------:|:---------------------------------------:|:--------------------------------------------:|
-| Model 3 (Mid-Stage SEEDING) | Model 4 (Final Stage Custom Reward / Gray ) | Model 4 (Final Stage Custom Reward / Orange) |
+<table style="width: 100%; border-collapse: collapse;">
+  <tr>
+    <td align="center" style="border: 1px solid #30363d; padding: 10px; width: 33.33%;">
+      <img src="imgs/SAC3.gif" alt="SAC3_gif" style="width: 100%; max-width: 300px;">
+    </td>
+    <td align="center" style="border: 1px solid #30363d; padding: 10px; width: 33.33%;">
+      <img src="imgs/SAC4.gif" alt="SAC4_gif" style="width: 100%; max-width: 300px;">
+    </td>
+    <td align="center" style="border: 1px solid #30363d; padding: 10px; width: 33.33%;">
+      <img src="imgs/SAC5.gif" alt="SAC5_gif" style="width: 100%; max-width: 300px;">
+    </td>
+  </tr>
+  <tr style="background-color: #161b22;">
+    <td align="center" style="border: 1px solid #30363d; padding: 8px;">
+      <b>Model 3 (Mid-Stage SEEDING)</b>
+    </td>
+    <td align="center" style="border: 1px solid #30363d; padding: 8px;">
+      <b>Model 4 (Final Stage Custom Reward / Gray)</b>
+    </td>
+    <td align="center" style="border: 1px solid #30363d; padding: 8px;">
+      <b>Model 4 (Final Stage Custom Reward / Orange)</b>
+    </td>
+  </tr>
+</table>
 
 ### Final Comparison and Insights
 * **Behavioral Progression**: Baseline models often fell into the "stagnation trap," spinning in place to avoid penalties. Policy refinement and custom reward shaping were essential to achieving consistent forward progress and trajectory smoothness.
