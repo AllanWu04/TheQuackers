@@ -121,7 +121,7 @@ The PPO training evolved from baseline establishment to late-stage refinement us
 
 |  ![PPO1_gif](imgs/PPO1.gif)  | ![PPO2_gif](imgs/PPO2.gif) |
 |:----------------------------:|:--------------------------:|
-|      Model 1 (Baseline)      |          Model 2 (Initial Tuning)          |
+|      Model 1 (Baseline)      |  Model 2 (Initial Tuning)  |
 
 
 #### Late-Stage Training (Reward Refinement)
