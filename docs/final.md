@@ -298,5 +298,5 @@ SAC evaluation focused on overcoming hardware constraints and exploration issues
 - AI Tools: We utilized Generative AI tools (Gemini/ChatGPT) to assist in debugging the `duckiebotssim` environment wrappers and to troubleshoot errors within our reinforcement learning training scripts.
 
 
-## Progress Video
+## Final Video
 <iframe width="560" height="315" src="https://www.youtube.com/watch?v=T2nD5hAvGJI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
